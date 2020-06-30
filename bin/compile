@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 export BUILD_DIR=$1
+export CACHE_DIR=$2
+export ENV_DIR=$3
 export POETRY_VERSION=1.0.8
 
 function indent() {
@@ -11,12 +13,30 @@ function indent() {
         esac
 }
 
+export_env_dir() {
+  env_dir=$1
+  acceptlist_regex=${2:-''}
+  denylist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$'}
+  if [ -d "$env_dir" ]; then
+    for e in $(ls $env_dir); do
+      echo "$e" | grep -E "$acceptlist_regex" | grep -qvE "$denylist_regex" &&
+      export "$e=$(cat $env_dir/$e)"
+      :
+    done
+  fi
+}
+
 echo "-----> Generate requirements.txt with Poetry"
 
 echo "-----> Install Poetry"
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python | indent
 
 source $HOME/.poetry/env
+
+echo "-----> Export Poetry credentials"
+
+export_env_dir "$ENV_DIR" '^POETRY_HTTP_BASIC_PYPI_LOCAL_USERNAME$'
+export_env_dir "$ENV_DIR" '^POETRY_HTTP_BASIC_PYPI_LOCAL_PASSWORD$'
 
 echo "-----> Export requirements.txt from Poetry"
 
