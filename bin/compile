@@ -33,10 +33,9 @@ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poet
 
 source $HOME/.poetry/env
 
-echo "-----> Export Poetry credentials"
+echo "-----> Export Poetry environment variables"
 
-export_env_dir "$ENV_DIR" '^POETRY_HTTP_BASIC_PYPI_LOCAL_USERNAME$'
-export_env_dir "$ENV_DIR" '^POETRY_HTTP_BASIC_PYPI_LOCAL_PASSWORD$'
+export_env_dir "$ENV_DIR" '^POETRY_'
 
 echo "-----> Export requirements.txt from Poetry"
 
